@@ -70,6 +70,7 @@ from discrete_mixed_bo.problems.coco_mixed_integer import Sphere
 from discrete_mixed_bo.problems.environmental import Environmental
 from discrete_mixed_bo.problems.nashpobench2 import NASHPOBenchII
 from discrete_mixed_bo.problems.oil_sorbent import OilSorbent, OilSorbentMixed
+from discrete_mixed_bo.problems.onemax import OneMax
 from discrete_mixed_bo.problems.pest import PestControl
 from discrete_mixed_bo.problems.re_problems import PressureVessel
 from discrete_mixed_bo.problems.svm import SVMFeatureSelection
@@ -537,7 +538,17 @@ def get_acqf(
 
 def get_problem(name: str, dim: Optional[int] = None, **kwargs) -> DiscreteTestProblem:
     r"""Initialize the test function."""
-    if name == "discrete_hartmann":
+    if name == "onemax30":
+        dim = 30
+        integer_bounds = torch.zeros(2, dim)
+        integer_bounds[1, :] = 1  # 2 values
+        onemax = OneMax(dim=dim)
+        return DiscretizedBotorchTestProblem(
+            problem=onemax,
+            integer_indices=list(range(dim)),
+            integer_bounds=integer_bounds,
+        )
+    elif name == "discrete_hartmann":
         dim = 6
         integer_bounds = torch.zeros(2, 4)
         integer_bounds[1, :2] = 2  # 3 values

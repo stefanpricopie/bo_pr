@@ -9,12 +9,12 @@ from setuptools import find_packages, setup
 requirements = [
     "torch",
     "gpytorch",
-    "botorch>=0.6",
+    "botorch==0.9.2",
     "scipy",
     "jupyter",
     "matplotlib",
     "nevergrad",
-    "sklearn",
+    # "sklearn",
     "statsmodels",
     "xgboost",
 ]

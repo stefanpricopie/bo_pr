@@ -222,6 +222,7 @@ class DiscretizedBotorchTestProblem(DiscreteTestProblem):
         r"""
         This assumes that only discrete X are passed.
         """
+        #TODO: X or orig_X?
         orig_X = self.get_orig_X(X=X)
         return self.problem.evaluate_slack_true(X)
 
