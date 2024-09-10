@@ -31,7 +31,11 @@ def fetch_data(kwargs: Dict[str, Any]) -> None:
 
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    exp_dir = os.path.join(current_dir, sys.argv[1])
+
+    # Here function_name is independent from the "function_name" in the json file for get_problem
+    function_name = sys.argv[1]
+    exp_dir = os.path.join(current_dir, function_name)
+
     config_path = os.path.join(exp_dir, "config.json")
     label = sys.argv[2]
     seed = int(float(sys.argv[3]))

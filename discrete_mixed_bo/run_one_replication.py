@@ -15,7 +15,7 @@ import nevergrad as ng
 import numpy as np
 import torch
 from botorch.acquisition.utils import is_nonnegative
-from botorch.fit import fit_gpytorch_model
+from botorch.fit import fit_gpytorch_mll
 from botorch.models.transforms.outcome import Standardize
 from botorch.optim.optimize import optimize_acqf_discrete
 from botorch.test_functions.base import (
@@ -92,7 +92,7 @@ def run_one_replication(
     save_frequency: Optional[int] = None,
     dtype: torch.dtype = torch.double,
     device: Optional[torch.device] = None,
-    save_callback: Optional[Callable[[Tensor], None]] = None,
+    save_callback: Optional[Callable[[Dict[str, Tensor]], None]] = None,
     problem_kwargs: Optional[Dict[str, np.ndarray]] = None,
     use_trust_region: bool = False,
     acqf_optim_seed: Optional[int] = None,
@@ -229,7 +229,6 @@ def run_one_replication(
 
     # Set some counters to keep track of things.
     start_time = time()
-    existing_iterations = 0
     wall_time = torch.zeros(iterations, dtype=dtype)
     if is_moo:
         bd = DominatedPartitioning(ref_point=base_function.ref_point, Y=Y)
@@ -320,7 +319,7 @@ def run_one_replication(
     all_xs_trajs = []
     all_true_af_trajs = []
     one_hot_to_numeric = None
-    for i in range(existing_iterations, iterations):
+    for i in range(0, iterations):
         loss_traj = []
         xs_traj = []
         true_af_traj = []
@@ -329,7 +328,7 @@ def run_one_replication(
             f"time: {time()-start_time}, current best obj: {best_objs[-1]}."
         )
         # Fit the model.
-        mll, model, ecdfs = initialize_model(
+        mll, model, _ = initialize_model(
             train_x=X,
             train_y=stdized_Y,
             binary_dims=binary_dims,
@@ -337,7 +336,7 @@ def run_one_replication(
             function_name=function_name,
             **model_kwargs,
         )
-        fit_gpytorch_model(mll)
+        fit_gpytorch_mll(mll)
         if label == "sobol":
             raw_candidates = (
                 draw_sobol_samples(
@@ -383,12 +382,9 @@ def run_one_replication(
             )
             acq_func = get_acqf(
                 label=label,
-                mc_samples=mc_samples,
                 model=model,
                 X_baseline=X,
-                num_constraints=num_constraints,
                 iteration=i + 1,
-                tkwargs=tkwargs,
                 base_function=base_function,
                 batch_size=batch_size,
                 exact_rounding_func=acqf_exact_rounding_func,

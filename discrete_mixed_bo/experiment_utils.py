@@ -358,7 +358,7 @@ def get_EI(
     num_constraints: int,
     standardize_tf: Standardize,
     posterior_transform: Optional[ScalarizedPosteriorTransform] = None,
-) -> ExpectedImprovement:
+) -> [ExpectedImprovement, ConstrainedExpectedImprovement]:
     if posterior_transform is not None:
         obj = posterior_transform.evaluate(train_Y)
     else:
@@ -418,13 +418,10 @@ def get_qEHVI(
 
 def get_acqf(
     label: str,
-    mc_samples: int,
     model: GPyTorchModel,
     X_baseline: Tensor,
     train_Y: Tensor,
     iteration: int,
-    tkwargs: dict,
-    num_constraints: int,
     base_function: DiscreteTestProblem,
     exact_rounding_func: ChainedInputTransform,
     standardize_tf: Standardize,
